@@ -18,8 +18,8 @@ const client = new MongoClient(uri, {
 
 const run = async () => {
   try {
-    const db = client.db('tech-net');
-    const productCollection = db.collection('product');
+    const db = client.db('book-motion');
+    const productCollection = db.collection('all-books');
 
     app.get('/books', async (req, res) => {
       const cursor = productCollection.find({});
@@ -36,7 +36,7 @@ const run = async () => {
       res.send(result);
     });
 
-    app.get('/product/:id', async (req, res) => {
+    app.get('/book/:id', async (req, res) => {
       const id = req.params.id;
 
       const result = await productCollection.findOne({ _id: ObjectId(id) });
