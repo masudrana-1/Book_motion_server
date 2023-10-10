@@ -19,19 +19,19 @@ const client = new MongoClient(uri, {
 const run = async () => {
   try {
     const db = client.db('book-motion');
-    const productCollection = db.collection('all-books');
+    const bookCollection = db.collection('all-books');
 
     app.get('/books', async (req, res) => {
-      const cursor = productCollection.find({});
-      const product = await cursor.toArray();
+      const cursor = bookCollection.find({});
+      const book = await cursor.toArray();
 
-      res.send({ status: true, data: product });
+      res.send({ status: true, data: book });
     });
 
-    app.post('/product', async (req, res) => {
-      const product = req.body;
+    app.post('/book', async (req, res) => {
+      const book = req.body;
 
-      const result = await productCollection.insertOne(product);
+      const result = await bookCollection.insertOne(book);
 
       res.send(result);
     });
@@ -39,55 +39,55 @@ const run = async () => {
     app.get('/book/:id', async (req, res) => {
       const id = req.params.id;
 
-      const result = await productCollection.findOne({ _id: ObjectId(id) });
+      const result = await bookCollection.findOne({ _id: ObjectId(id) });
       console.log(result);
       res.send(result);
     });
 
-    app.delete('/product/:id', async (req, res) => {
+    app.delete('/book/:id', async (req, res) => {
       const id = req.params.id;
 
-      const result = await productCollection.deleteOne({ _id: ObjectId(id) });
+      const result = await bookCollection.deleteOne({ _id: ObjectId(id) });
       console.log(result);
       res.send(result);
     });
 
-    app.post('/comment/:id', async (req, res) => {
-      const productId = req.params.id;
-      const comment = req.body.comment;
+    app.post('/review/:id', async (req, res) => {
+      const bookId = req.params.id;
+      const review = req.body.review;
 
-      console.log(productId);
-      console.log(comment);
+      console.log(bookId);
+      console.log(review);
 
-      const result = await productCollection.updateOne(
-        { _id: ObjectId(productId) },
-        { $push: { comments: comment } }
+      const result = await bookCollection.updateOne(
+        { _id: ObjectId(bookId) },
+        { $push: { reviews: review } }
       );
 
       console.log(result);
 
       if (result.modifiedCount !== 1) {
-        console.error('Product not found or comment not added');
-        res.json({ error: 'Product not found or comment not added' });
+        console.error('book not found or review not added');
+        res.json({ error: 'book not found or review not added' });
         return;
       }
 
-      console.log('Comment added successfully');
-      res.json({ message: 'Comment added successfully' });
+      console.log('review added successfully');
+      res.json({ message: 'review added successfully' });
     });
 
-    app.get('/comment/:id', async (req, res) => {
-      const productId = req.params.id;
+    app.get('/review/:id', async (req, res) => {
+      const bookId = req.params.id;
 
-      const result = await productCollection.findOne(
-        { _id: ObjectId(productId) },
-        { projection: { _id: 0, comments: 1 } }
+      const result = await bookCollection.findOne(
+        { _id: ObjectId(bookId) },
+        { projection: { _id: 0, reviews: 1 } }
       );
 
       if (result) {
         res.json(result);
       } else {
-        res.status(404).json({ error: 'Product not found' });
+        res.status(404).json({ error: 'book not found' });
       }
     });
 
@@ -117,9 +117,9 @@ const run = async () => {
 run().catch((err) => console.log(err));
 
 app.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.send('Book Motion Server');
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`Book Motion Server running on port: ${port}`);
 });
